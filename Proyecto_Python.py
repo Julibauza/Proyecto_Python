@@ -2,24 +2,19 @@
 # de cada letra en la cadena. Los espacios no deben ser considerados
 
 Cadena = "La bicicleta tiene dos ruedas"
-Diccionario_frecuencias = {}
 
-def contar_letras (texto):
-    texto = texto.lower() 
+def contar_letras(texto):
+    frecuencias = {}
+    texto = texto.lower()
     for letra in texto:
-        if letra == " " : 
-            pass
-        else: 
-            if letra in Diccionario_frecuencias:
-               Diccionario_frecuencias[letra] += 1
-            else: 
-                Diccionario_frecuencias [letra] = 1
-    
-    return Diccionario_frecuencias
+        if letra != " ":
+            if letra in frecuencias:
+                frecuencias[letra] += 1
+            else:
+                frecuencias[letra] = 1
+    return frecuencias
 
 print(contar_letras(Cadena))
-
-
 
 # 2. Dada una lista de números, obtén una nueva lista con el doble de cada valor. Usa la función map()
 
@@ -138,17 +133,14 @@ print(f"Las mascotas permitidas en España son: {mascotas_permitidas}")
 #10 . Escribe una función que reciba una lista de números y calcule su promedio. Si la lista está vacía, lanza una 
 #excepción personalizada y maneja el error adecuadamente.
 
+
 numeros = [1, 5, 4, 8, 9, 13, 23, 14]
 lista_2= []
 
 def promedio(lista_numeros):
-     if len(lista_numeros) == 0:
-        return "La lista está vacía"
-     suma_numeros = 0
-     for numero in lista_numeros:
-        suma_numeros += numero
-     media = suma_numeros / len (lista_numeros)
-     return (f"El promedio de la lista es: {media}")
+    if len(lista_numeros) == 0:
+        raise ValueError("La lista está vacía")
+    return(f"El promedio de la lista es {sum(lista_numeros) / len(lista_numeros)}")
 
 print(promedio(numeros))
 print(promedio(lista_2))
@@ -336,10 +328,12 @@ print(calcular_promedio (Lista_A))
 
 herramientas = ["tornillo", "tuerca", "llave", "tornillo", "pinza", "tuerca"]
 
-def primer_duplicado (lista):
-    for palabra in lista:
-        if lista.count(palabra) > 1: 
-            return palabra
+def primer_duplicado(lista):
+    vistos = set()
+    for elemento in lista:
+        if elemento in vistos:
+            return elemento
+        vistos.add(elemento)
 
 print(primer_duplicado(herramientas))
 
@@ -394,7 +388,7 @@ def lista_nombres ():
     raise Exception (f"El nombre {nombre} no ha sido encontrado en la lista")
 
 
-print(lista_nombres())
+lista_nombres()
 
 
 # 32. Crea una función que tome un nombre completo y una lista de empleados, busque el nombre completo en la lista y devuelve el puesto del 
@@ -465,8 +459,9 @@ class Arbol:
         for i, rama in enumerate(self.ramas):
             self.ramas[i] = self.ramas[i] + 1
 
-    def quitar_rama (self, pos):
-        self.ramas.pop(pos)
+    def quitar_rama(self, pos):
+        if 0 <= pos < len(self.ramas):
+          self.ramas.pop(pos)
 
     def info_arbol (self):
         return (f"La longitud del tronco es {self.tronco}, tiene {len(self.ramas)} rama/s y las longitudes de las ramas son: {self.ramas}")
@@ -523,9 +518,9 @@ class Usuario_banco:
                 return "El monto a transferir debe ser mayor a 0"
             elif monto_transferir > otro_usuario.saldo:
                 return "El saldo de la cuenta de origen no es suficiente"
-            elif monto_transferir <= otro_usuario.saldo:
-                otro_usuario.saldo -= monto_transferir
-                self.saldo += monto_transferir
+            elif monto_transferir <= self.saldo:
+                self.saldo -= monto_transferir
+                otro_usuario.saldo += monto_transferir
                 return "Transferencia realizada con éxito"
         else: 
             return "El/los usuario/s no tiene/n cuenta corriente en el Banco"    
@@ -596,9 +591,11 @@ def eliminar_palabra (texto_original, palabra_a_borrar):
     for p in string.punctuation:
         texto_original = texto_original.replace(p, "")
 
-    palabras = texto_original.split()    
-    palabras.remove(palabra_a_borrar.lower())
+    palabras = texto_original.split()  
+    if palabra_a_borrar.lower() in palabras:  
+      palabras.remove(palabra_a_borrar.lower())
     return " ".join(palabras)
+
 
 def procesar_texto (texto, opcion, *args):
     if opcion == "contar":
@@ -623,10 +620,13 @@ hora = input("Por favor ingrese la hora actual (HH:MM)")
 partes = hora.split(":")
 
 if len(partes) == 2: 
-
+   try:
     h = int(partes[0])
     m = int(partes[1])
+   except ValueError:
+    print("Debe ingresar valores numéricos")
 
+   else:  
     if 0 <= h <= 23 and 0 <= m <= 59:
       if 0 <= h < 6:
        print ("Es de noche")
@@ -716,28 +716,34 @@ print(calcular_area(forma3, datos3))
    #5. Muestra el precio final de la compra, teniendo en cuenta el descuento aplicado o sin él. 
    #6. Recuerda utilizar estructuras de control de flujo como if, elif y else para llevar a cabo estas acciones en tu programa de Python
 
-
-precio_original = int(input("Por favor ingrese el precio original del articulo"))
-cupon_descuento = input("¿Tiene cupón de descuento? Responda si o no").lower()
-
-if cupon_descuento == "si":
-    valor_cupon = int(input("Ingrese el valor del cupón"))
-    if 0 < valor_cupon <= precio_original: 
-        precio_final = precio_original - valor_cupon
-        print(f"El precio final del articulo con el descuento aplicado es: {precio_final}€")
     
-    elif valor_cupon > precio_original:
-        precio_final = 0
-        resto_cupon = valor_cupon - precio_original
-        print(f"El precio final del articulo es: {precio_final}€, y en su cupón de descuento aún tiene: {resto_cupon}€")
+try:
+    precio_original = int(input("Por favor ingrese el precio original del artículo: "))
+except ValueError:
+    print("Debe ingresar un número válido para el precio")
+else:
+    cupon_descuento = input("¿Tiene cupón de descuento? Responda si o no: ").lower()
+
+    if cupon_descuento == "si":
+        try:
+            valor_cupon = int(input("Ingrese el valor del cupón: "))
+        except ValueError:
+            print("Debe ingresar un número válido para el cupón")
+        else:
+            if 0 < valor_cupon <= precio_original:
+                precio_final = precio_original - valor_cupon
+                print(f"El precio final del artículo con descuento es: {precio_final}€")
+
+            elif valor_cupon > precio_original:
+                precio_final = 0
+                resto_cupon = valor_cupon - precio_original
+                print(f"El precio final del artículo es: {precio_final}€, y aún tiene {resto_cupon}€ en el cupón")
+
+            else:
+                print("El valor del cupón debe ser mayor que 0")
 
     else:
-        print("El valor ingresado es incorrecto")
-
-else: 
-    print(f"El precio final del articulo es: {precio_original}€")        
-
-
+        print(f"El precio final del artículo es: {precio_original}€")
 
 
 
